@@ -1,0 +1,67 @@
+\documentclass[oneside]{book}
+
+\usepackage{geometry}
+\geometry{
+ a4paper,
+ left=1.5in,
+ top=1in,
+ bottom=1in,
+ right=1in
+}
+\usepackage[utf8]{inputenc}
+\usepackage{emptypage}
+\usepackage{changepage}
+
+\newenvironment{sectionlist}
+  {\adjustwidth{3em}{0pt}}
+  {\endadjustwidth}
+
+\begin{document}
+
+\frontmatter
+
+\title{Title}
+\maketitle
+
+\chapter{Abstract}
+Abstract goes here
+
+\chapter{Acknowledgements}
+Acknowledgements goes here
+
+\tableofcontents
+
+\chapter{List of Tables}
+List of Tables goes here
+
+\chapter{List of Figures}
+List of Figures goes here
+
+\chapter{Abbreviations}
+List of Abbreviations goes here
+
+\mainmatter
+
+\chapter{Introduction}
+\input{chapter1}
+
+\chapter{Literature Review}
+\input{chapter2}
+
+\chapter{Methodology}
+\input{chapter3}
+
+\chapter{Implementation}
+\input{chapter4}
+
+\chapter{Evaluation}
+\input{chapter5}
+
+\chapter{Conclusion}
+\input{chapter6}
+
+\newpage
+\bibliographystyle{IEEEannot}
+\bibliography{ref}
+
+\end{document}
