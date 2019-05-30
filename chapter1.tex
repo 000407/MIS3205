@@ -4,18 +4,97 @@ In this introductory chapter, it is focused on elaborating the overview and deve
 
 Human brain is known and identified to be an extraordinary organ among all of the known living beings to date. It has been identified to be capable of doing many different things and among them \textit{pattern recognition ability} is known to be one of the most prominent, and also one of the prominent obsession. This ability and the obsession has led the human being to further expand the attempts to discover knowledge with the use of patterns and correlations.
 
-Patterns and ability to discover them, makes a system predictable. This was absolutely necessary for most cases and applications. The availability and discover-ability of patterns in different systems, has paved the way to discover vast amounts of knowledge, causing many different advancements in each discipline.  However on the contrary, this has led to some other systems to be less reliable. Certain areas in computing especially cryptography, relies on the attribute of the system being unpredictable. For the case of cryptographic systems, more the system is predictable, more vulnerable it would be. This, and some other applications requirements such as in simulations and so forth have craved for systems to be random in their behavior.
+Patterns and ability to discover them, makes a system predictable. This was absolutely necessary for most cases and applications. The availability and discover-ability of patterns in different systems, has paved the way to discover vast amounts of knowledge, causing many different advancements in each discipline.  However on the contrary, this has led to some other systems to be less reliable. Certain areas in computing especially cryptography, relies on the attribute of the system being unpredictable. For the case of cryptographic systems, more the system is predictable, more vulnerable it would be. This, and some other applications requirements such as in simulations and so forth have craved for systems to be random in their behaviour.
 
 \section{Background}
 
+Throughout the early parts of the known history of mankind, chance and randomness were knitted together with fate. There are number of historic evidences that suggests that people threw dice to decide the fate which later has evolved into games of chance. Some of these games are spanned even to date. Also, evidences also suggest that various methods divination existed in most ancient cultures which are attempts to circumvent randomness and fate.
+
+Perhaps, the earliest people to formalise odds and chance are believed to be Chinese people, 3000 years ago. Historic evidences from Greece suggests that the Greek philosophers had dived deep in discussions on randomness, nonetheless only in subjective forms. It took time until the \nth{16} century to initiate formalisation of the odds associated with various games of chance, by the Italian mathematicians. In the \nth{19} century the concept of \textit{Entropy} was introduced. With this and the invention of calculus was highly positive impact on the study of randomness. Then during the early part of the \nth{20} century, formal analysis on the randomness has started to grow rapidly and steadily with proper mathematical foundations based on probability. In parallel, quantum mechanics changed the scientific perspective on determinacy and ideas of algorithmic randomness started to surface.
+
+Due to the lack of scientific knowledge it has been long believed that randomness is comprehended to be an obstacle. Since deliberate introduction of randomness into computations was understood as an effective way for designing better algorithms, this has started to change. Ironically in certain cases, the best deterministic methods were outperformed by the randomisation algorithms.
+
+There is a large number of applications such as cryptography, gaming, sampling, simulations and so forth, mainly in the domains of computing and statistics. Specially in cryptography, security of certain algorithms are entirely dependent on the seeds which are used as inputs and these seeds are generated using some form of randomness. At the same time, certain statistical applications which include but not limited to sampling and Monte-Carlo simulations needs some random data which are of heavy volumes. An parallel to these, it is also quite important that any form or generation be as fast as possible. However, it is generally accepted that generating complex and purely random numbers in large volumes at high speeds it the ideal combination which is far less feasible because these are conflicting requirements.
+
 \subsection{Randomness}
 
-\subsection{True Randomness vs. Pseudo-Randomness}
+Randomness in general sense could be comprehended as \textit{absence of pattern or predictability in events}. In fact, a sequence of symbols or events which is deemed random does not stick to any tangible patterns. Popular examples of random events include flipping a fair coin and rolling a fair dice. The output of such events are believed to be truly random, hence provides the base for many cases and experiments. Apart from that, there are certain other phenomena which could be observed in our surroundings are also widely accepted to be random. Brownian motion, thermal noise and so forth could be considered as examples for such. Most other microscopic phenomena also are widely being used in different levels of abstractions, to generate certain forms of randomness. 
+
+Lack of patterns is believed to be true for most of the cases which are taken individually yet, in most of the cases as the process that generates the aforesaid randomness is repeated over a large number of iterations, the sequence starts to appear to be more and more predictable. When rolling two dice for an instance, the occurrence of any particular event is unpredictable, yet a sum of $7$ will occur twice as often as 4. This is a prime example that highlights the fact that predictability of a system is dependent on the amount of information that is available regarding the system. With this perspective it could be concluded that randomness not mere \textit{Haphazardness}, but a measure of outcomes. In fact, randomness is closely tied with concepts of \textit{Probability} and \textit{Information Entropy}.
+
+The fields of mathematics, probability, and statistics use formal definitions of randomness. In statistics, a random variable is an assignment of a numerical value to each possible outcome of an event space. This association facilitates the identification and the calculation of probabilities of the events. Random variables can appear in random sequences. A random process is a sequence of random variables whose outcomes do not follow a deterministic pattern, but follow an evolution described by probability distributions. These and other constructs are extremely useful in probability theory and the various applications of randomness.
 
 \subsection{Existence of Randomness}
 
+The question \textit{Does randomness truly exist?} is arguably one of the most popular question among scholars from many different disciplines. There seem to have different distinct philosophical strongholds which are considering different perspectives on randomness. However it is widely accepted that randomness is \textit{an attribution} to the property of \textit{lack of knowledge on the causality of a phenomenon}. Randomness is not a cause that results in different effects. Yet it is erroneously stated more often. In that sense, it could be safely concluded that as long as there exists some phenomena which the human being possess no knowledge of, there exists randomness. This could also be defined and portrayed using the relativity. 
+
+\subsection{Forms of Randomness}
+
+Modern day, there are mainly two different forms of randomness, which are based on different sources. Those are namely \acrfull{trng}s and \acrfull{prng}s. Comparison between these two could be easily done by considering a simple flipping of a fair coin. It is widely accepted that flipping a fair coin demonstrates random behaviour. There are two approaches to use these flips as random. First, the coin could be flipped whenever there is a need of random binary result. Here, the source of randomness is provoked on-demand and the result is used. This is how the TRNGs theoretically function. That mimics getting the generator to flip the coin on-demand. However, it is physically infeasible to bring such macroscopic phenomenon to computers. Hence, additional hardware devices and sophisticated computer programs are utilised in capturing certain microscopic phenomenon and using those metrics to generate random numbers.
+
+The other approach is to have the coin flipped a large number of times previously and their records are collected into a collection. Now, whenever there is a requirement of a random binary result, one could query the data set for the next random bit. This approach very closely mimic the behaviour of a PRNG. Instead of a large finite data set, almost all modern PRNGs have an algorithm which is switching between a very large number of states, which are determined by and highly sensitive to the initial condition/input (also known as \textit{seed}). 
 \section{Motivation}
+
+It is experimentally proved that PRNGs are performing quite well. In fact in certain aspects, PRNGs appear to have outperformed most of the TRNGs. Yet there are certain inherent weaknesses are known to be associated with them. One such is that they are periodic i.e. after a certain number of iterations, the sequence that is generated is repeated. Even though these numbers are ranging from $2^{127}-1$ to $2^{19937}-1$ and even beyond that. Still, it is important to take into account the fact that computational power is also advancing at exponential rates. There is a growing argument that binary computers based on finite state machines are reaching their limits of performance envelopes. Still it is uncertain that it would occur in the near future. At the same time, there are new advancements in computing such as \textit{Quantum Computing}. These at the moment are theoretically promising a new, powerful breed of computational devices. There is a chance that, PRNGs might fall short of the revised statistical requirements and testing criteria, based on the advancements of computing.
+
+Being \textit{Cryptographically Secure} is another important attribute of a better RNG. Even though there is a number of PRNGs available, most of them fall short in testing for cryptographic security. The reason why this is quite important is that random numbers are used in many cryptographic applications quite often. These include key generation, nonce values, salts in certain signature schemes and so forth. Also, the quality requirements that each application demands would be different from one application to another. Only a handful is being used and available in cryptographic applications. This is another major problem that PRNGs suffer from.
+
+On the contrary, the counterpart TRNG is also suffering from known lapses and weaknesses. Even though the TRNGs provide statistically high-quality random bits, performance have been a major issue. Due to the high-end technological requirements and the portability issues introduced by such hardware devices, it is quite difficult to effectively employ the TRNGs specially in the context of personal computing, where \textit{compactness} is deemed to be quite important. Apart from that, since TRNGs are based on physical phenomena, TRNGs in most of the cases are suffering from falling short of the volume requirements. It is quite time consuming to generate large volumes of random data, due to the fact that effective generation rate of the TRNGs are actually the rate of change in the physical phenomenon which is being monitored by the particular TRNG. Since these are mostly microscopic phenomena, the rates that which they are changing are quite low, giving a low frequency of change.
+
+Therefore it is essential to look for sustainable options which offer better flexibility to suite the environment and the task being performed, while preserving the prime attributes and requirements of randomness. Also it is quite important to take the property of being cryptographically secure, into account during the discovery of alternatives. This research is intended to attempt to discover opportunities to fill that gap, by evaluating the system environments for possible alternatives, under the scope mentioned below.
 
 \section{Objectives and Scope}
 
+The primary objectives of this research study are
+\begin{enumerate}
+    \item to explore and identify the possible sources of randomness within the system and its surroundings.
+    
+    \item to identify and establish transformation strategies (hereafter referred to as \textit{Distillation}) which are required to improve the complexity and volume.
+    
+    \item to identify and establish the encryption strategies (hereafter referred to as \textit{Hardening}) which are required to meet the cryptographic security requirements.
+    
+    \item to identify evaluation strategies to assess the quality of the outputs.
+    
+    \item to assess the quality of the outputs based on the complexity and volume requirements in order to determine the performance of the system.
+\end{enumerate}
+
+It is important to take note on the following points regarding the scope of the study, as there are heaps of studies which are based on different perspectives, which have opened up a number of different paths to proceed.
+
+\begin{itemize}
+    \item The domain of the study is restricted to \textit{Computing}. There also, the primary focus is on the context of \textit{Personal Computing}.
+    
+    \item The system being evaluated is as established in the latter part of the study. To briefly elaborate, the term \textit{System} refers to the computational device being taken into consideration.
+    
+    \item The behaviour of the system is considered and activities such as network data flow, \acrfull{ram} usage and so forth are monitored to observer their behaviour in terms of randomness. Along with that, natural effects of such behaviour is also monitored for the same.
+    
+    \item It is focused on possible sources of randomness that could be found in the near vicinity of a majority of computational devices. Also, a selected set of device related metrics also taken into consideration, as sources of randomness. Their suitability is also evaluated here
+    
+    \item Evaluation criteria for the randomness is fixed at the "\textit{\textbf{Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications}}" published by \acrfull{nist} under SP 800-22 Rev. 1a. This was chosen due to its wider acceptance among the community.
+    
+    \item Implementations of any sort are done using the language \textit{Python}. Python was chosen as the implementation language due to its expressive syntax and native support for certain large-date operations.
+    
+    \item Possible options to make the output cryptographically secure by hardening, are taken into account and evaluated. There the main focus will be on stream ciphers and \textit{asymmetric encryption schemes}.
+\end{itemize}
+
 \section{Structure of the Thesis}
+
+This thesis is comprised of the following chapters from this point forth. The content of each chapter is briefly summarised against each chapter name.
+
+\begin{sectionlist}
+    \subsubsection{Chapter 2 - Literature Review}
+    This chapter is dedicated to review the current literature and related work, in order to establish the foundation of the research. Related aspects such as formal definitions, terminology, existence of randomness, forms and sources of randomness, testing for randomness and so forth are addressed in fine detail in this chapter. 
+	
+    \subsubsection{Chapter 3 - Methodology}
+    Here it is focused on the methodology that the research is undertaken. Formal establishment of the scope, flow of work in the research, choices of different strategies for distillation and hardening and the justifications of those choices, choice of the testing strategy along with the justifications are discussed in this chapter.
+	
+    \subsubsection{Chapter 4 - Implementation}
+    This chapter is including the details of the implementation of the above methodology. Different code snippets used along with their flow of activity and performance, other aspects related to implementation are addressed in this chapter.
+	
+    \subsubsection{Chapter 5 - Evaluation}
+    All the details of the test execution results and the interpretation of those results are summarised in this chapter. It also includes a weighing of merits and demerits of the implementations which would be supportive to the conclusions that could be arrived at.
+	
+    \subsubsection{Chapter 6 - Conclusion}
+    This chapter is a complete retrospect of the research which has taken three main perspectives into consideration. Initially, it is focused on the lessons learnt by the author during the research project. Then, the initial plan and the output artefacts are compared to determine and scale the success of the research project. Finally, it has enumerated various possible routes to proceed for future work related to this research.
+\end{sectionlist}
+
+Apart from the main body enumerated and elaborated above, the thesis also has the supplementary documents and written artefacts attached as appendices.

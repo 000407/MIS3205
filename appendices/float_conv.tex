@@ -1,0 +1,74 @@
+\chapter{Floating Point Converter - Python}
+\begin{code}
+    \begin{minted}[breaklines,tabsize=2]{py}
+    class Float(object):
+    	def __init__(self, l, m, n):
+    		super(Float, self).__init__()
+    
+    		n = str(n)
+    		n1 = n.split('.')
+    
+    		# Resolution of sign and integer
+    		n = int(n1[0])
+    		n = '{0:b}'.format(n)
+    		n = n.split('-')
+    		s = 1 if not n[0] else 0
+    		n = n[1] if not n[0] else n[0]
+    		n = [int(e.encode('ascii')) for e in n]
+    
+    		e = l - m - 1;
+    
+    		# Resolution of exponent
+    		decPos = len(n) - 1
+    
+    		
+    		if len(n) == 1 and n[0] == 0:
+    			decPos -= 1
+    
+    		# Resolution of float
+    		f = n1[1]
+    		f = [int(e.encode('ascii')) for e in f]
+    
+    		zero = [0] * len(f)
+    
+    		sig = []
+    
+    		decPosFound = decPos > -1
+    
+    		while True:
+    			if f == zero:
+    				break
+    			
+    			[of, f] = self.__arrayTimes2(f)
+    
+    			if not decPosFound:
+    				if of == 1:
+    					decPosFound = True
+    				else:
+    					decPos -= 1
+    			
+    			if len(sig) >= (m - decPos):
+    				break
+    
+    			sig.append(of)
+    
+    		n = n[1:] + sig[sig.index(1):]
+    
+    		n += [0] * (m - len(n))
+    		
+    		decPos += ((2 ** e) >> 1) - 1
+    		exp = [int(e.encode('ascii')) for e in ('{0:b}'.format(decPos))]
+    		
+    		self.n = [s] + exp + n
+    
+    	def __arrayTimes2(self, arr):
+    		of = 0
+    		for i in reversed(range(len(arr))):
+    			x = of + (arr[i] * 2)
+    			of = x // 10
+    			arr[i] = x % 10
+    		return [of, arr]
+    \end{minted}
+    \caption{Python implementation of the \texttt{Float} class}
+    \label{lst:py_class_float}
+\end{code}

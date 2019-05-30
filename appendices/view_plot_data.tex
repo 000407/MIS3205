@@ -1,0 +1,79 @@
+\chapter{View Plot Routine}
+
+This routine was used to generate the plots of the linear difference data on CPU metrics.
+\begin{code}
+    \begin{minted}[breaklines,tabsize=2]{py}
+    #!/usr/bin/python3
+
+    from pymongo import MongoClient
+    import os
+    import matplotlib.pyplot as plt
+    import datetime
+    from gridfs import GridFS
+    from bson import ObjectId
+    import ast
+    import sys
+    
+    def now():
+    	return str(datetime.datetime.now())
+    
+    def log(message, *args):
+    	message = message.format(*args)
+    	print('{}: {}'.format(now(), message))
+    
+    def main():
+    	log("Connecting to DB...")
+    	client = MongoClient('mongodb://127.0.0.1:27017/', connect=False)
+    	db = client.db_mis_research
+    	fs = GridFS(db)
+    	plots = db.plots
+    
+    	pltId = sys.argv[1]#"PLT_ADJ_INTERRUPTS_DIFFERENCES"
+    	plot = plots.find_one({'_id':pltId})
+    	fileId = plot['fileId']
+    
+    	file = fs.get(ObjectId(fileId)).read().decode('utf-8')
+    	log("CONNECTED! Files found and retrieved!")
+    
+    	obj = ast.literal_eval(file)
+    
+    	try:
+    		offset = int(sys.argv[2])
+    	except IndexError:
+    		offset = 0
+    
+    	try:
+    		limit = int(sys.argv[3])
+    	except IndexError:
+    		limit = len(obj[0]) 
+    
+    
+    	plt.plot(obj[0][offset:(offset + limit)], obj[1][offset:(offset + limit)])
+    
+    	plt.xlabel(plot['xLabel']) 
+    	plt.ylabel(plot['yLabel']) 
+    	
+    	plt.title(plot['title'])
+    	plt.show()
+    
+    	client.close()
+    
+    if __name__ == '__main__':
+    	try:
+    		main()
+    	except (KeyboardInterrupt, SystemExit):
+    		print('Shutting down...')
+    		try:
+    			sys.exit(0)
+    		except SystemExit:
+    			os._exit(0)
+    
+    	except IndexError as e:
+    		print("USAGE:view_plot.py <<PlotID>> [<<int offset>> [<<int limit>>]]")
+    
+    	except TypeError as e:
+    		print("{} was not found in the DB.".format(sys.argv[1]))
+    \end{minted}
+    \caption{Python implementation for plotting linear differences of CPU metrics stored in the database}
+    \label{lst:py_class_float}
+\end{code}

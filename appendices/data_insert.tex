@@ -1,0 +1,56 @@
+\chapter{CPU Metrics Data Insertion Routine}
+\begin{code}
+    \begin{minted}[breaklines,tabsize=2]{py}
+    #!/usr/bin/python3
+    from pymongo import MongoClient
+    import os
+    from os import listdir
+    from os.path import isfile, join
+    import json
+    from loggin import log
+    
+    log("Connecting to Database...")
+    client = MongoClient('mongodb://127.0.0.1:27017/', connect=False)
+    db = client.db_mis_research
+    # col = db.internalMetricsIdle
+    # col = db.internalMetricsWorking
+    
+    txtDir = './txt'
+    
+    fileNames = [f for f in listdir(txtDir) if isfile(join(txtDir, f))]
+    
+    for filename in fileNames:
+    	epochHour = int((filename.split(".txt"))[0])
+    	path = '{}/{}'.format(txtDir, filename)
+    	with open(path) as fp:  
+    		line = fp.readline()
+    		cnt = 0
+    		while line:
+    			docId = epochHour + cnt
+    			extObj = col.find_one({'_id':docId})
+    
+    			obj = json.loads(line.strip())
+    
+    			if extObj != None:
+    				dupLog = open('./logs/dupes/{}.dup.log'.format(epochHour), 'a+')
+    				logEntry = '{{"OBJ":{}, "EXT_OBJ":{}}}\n'.format(json.dumps(obj), json.dumps(extObj))
+    				dupLog.write(logEntry)
+    				dupLog.close()
+    
+    				log('Duplicate entry found for {} when processing {}\n', docId, path)
+    				cnt += 1
+    				continue
+    				# os._exit(0)
+    
+    			obj['_id'] = docId
+    			oId = col.insert_one(obj).inserted_id
+    			# print('Processed {}. Created Document with ID {}'.format(path, oId))
+    			line = fp.readline()
+    			cnt += 1
+    		log("{}::DONE! Processed {} documents!\n", path, cnt)
+    
+    log("DONE!")
+    \end{minted}
+    \caption{Python implementation of data insertion to a MongoDB database}
+    \label{lst:py_class_float}
+\end{code}

@@ -1,0 +1,141 @@
+\chapter{CPU Metrics Collector Routine}\label{adx:grabber}
+\begin{code}
+    \begin{minted}[breaklines,tabsize=2]{py}
+    #!/usr/bin/python3
+    
+    import os
+    import sys
+    import threading
+    import time
+    import psutil
+    import json
+    import cutil
+    import re
+    
+    StartTime = None
+    fileNameStr = None
+    fileName = None
+    fSource = None
+    
+    
+    def grab():
+    	global fileNameStr
+    	global fSource
+    
+    	fileName = str(fileNameStr) + ".txt"
+    	if fSource.closed:
+    		fSource = open(fileName, "a")
+    
+    	if fileNameStr != str(cutil.epochHour()):
+    		fSource.close()
+    		print(fileName, " is closing...")
+    		fileNameStr = str(cutil.epochHour())
+    		fileName = fileNameStr + ".txt"
+    		fSource = open(fileName, "a")
+    		print("DONE! Started logging in a new file ", fileName)
+    
+    	metrics = dict()
+    
+    	# Retrieval of CPU stats
+    	res = psutil.cpu_stats()
+    	resType = type(res).__name__
+    	data = dict(res._asdict())
+    	data["temperature"] = psutil.sensors_temperatures(1)  # TODO: Fahrenheit? Or Celsius
+    	metrics[resType] = data
+    
+    	# Retrieval of Memory Stats
+    	res = psutil.virtual_memory()
+    	resType = type(res).__name__
+    	data = dict(res._asdict())
+    	metrics[resType] = data
+    
+    	# Retrieval of Disk Usage Stats
+    	res = psutil.disk_usage("/")
+    	resType = type(res).__name__
+    	data = dict(res._asdict())
+    	metrics[resType] = data
+    
+    	fSource.write(json.dumps(metrics) + "\n")
+    
+    
+    def getConnections():
+    	for con in psutil.net_connections():
+    		try:
+    			yield [psutil.Process(pid=con.pid).name(), con]
+    		except psutil.AccessDenied:
+    			continue
+    
+    
+    def toSeconds(timeStr):
+    	if re.match(r'^[\d]+[hHmMsS]$', timeStr, re.M | re.I) is None:
+    		raise ValueError("Invalid input string.")
+    	timeUnit = (timeStr[-1])
+    	timeAmt = int(timeStr.replace(timeUnit, ""))
+    	timeUnit = timeUnit.lower()
+    
+    	seconds = {
+    		'h': lambda timeAmt: timeAmt * 60 * 60,
+    		'm': lambda timeAmt: timeAmt * 60,
+    		's': lambda timeAmt: timeAmt
+    	}[timeUnit](timeAmt)
+    
+    	return seconds
+    
+    
+    class SetInterval:
+    	def __init__(self, interval, action):
+    		self.interval = interval
+    		self.action = action
+    		self.stopEvent = threading.Event()
+    		thread = threading.Thread(target=self.__setInterval)
+    		thread.start()
+    
+    	def __setInterval(self):
+    		nextTime = time.time() + self.interval
+    		while not self.stopEvent.wait(nextTime - time.time()):
+    			nextTime += self.interval
+    			self.action()
+    
+    	def cancel(self):
+    		self.stopEvent.set()
+    
+    
+    def main():
+    	global StartTime
+    	global fileNameStr
+    	global fileName
+    	global fSource
+    
+    	interval = int(sys.argv[1])
+    	cycles = toSeconds(sys.argv[2])
+    
+    	StartTime = time.time()
+    	fileNameStr = str(cutil.epochHour())
+    	fileName = fileNameStr + ".txt"
+    	fSource = open(fileName, "a")
+    
+    	# start action every {interval} seconds
+    	inter = SetInterval(interval, grab)
+    	print('Commenced reading datasources : {:.1f}s'.format(time.time()))
+    
+    	# will stop interval in {cycles} seconds
+    	t = threading.Timer(cycles, inter.cancel)
+    	t.start()
+    
+    
+    if __name__ == '__main__':
+    	try:
+    		main()
+    	except (KeyboardInterrupt, SystemExit):
+    		print('Shutting down...')
+    		try:
+    			sys.exit(0)
+    		except SystemExit:
+    			os._exit(0)
+    
+    	except IndexError as e:
+    		print("USAGE:python grab.py <<Interval>> <<Duration in H|M|S>>")
+    \end{minted}
+    \caption{Python implementation of the CPU Data capturing routine}
+    \label{lst:py_class_float}
+\end{code}

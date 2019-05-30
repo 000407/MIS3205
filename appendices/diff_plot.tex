@@ -1,0 +1,128 @@
+\chapter{Sequence Differentiation Routine}
+\begin{code}
+    \begin{minted}[breaklines,tabsize=2]{py}
+    #!/usr/bin/python3
+
+    import multiprocessing
+    from multiprocessing import Pool
+    from pymongo import MongoClient
+    import os
+    from os import listdir
+    from os.path import isfile, join
+    import json
+    import matplotlib.pyplot as plt
+    import threading
+    import datetime
+    from gridfs import GridFS
+    import numpy
+    from loggin import log
+    
+    def nowStr():
+    	return str(datetime.datetime.now())
+    
+    def now():
+    	return datetime.datetime.now()
+    
+    def f(x):
+    	return x["scpustats"]["interrupts"]
+    
+    client = MongoClient('mongodb://127.0.0.1:27017/', connect=False)
+    db = client.db_mis_research
+    fs = GridFS(db)
+    
+    col = db.internalMetricsIdle
+    
+    
+    project = {'scpustats.interrupts':1, 'scpustats.soft_interrupts':1, 'scpustats.syscalls':1, 'scpustats.ctx_switches':1}
+    
+    log('Commenced reading databases...')
+    
+    res = col.find({}, project)
+    scpustatsList = list(res)
+    
+    log("Extraction to a list of dictionaries is completed. Starting collecting interrupts counts...")
+    
+    interruptsCounts = []
+    
+    def getInterrupts(x):
+    	return x["scpustats"]["interrupts"]
+    
+    def getSoftInterrupts(x):
+    	return x["scpustats"]["soft_interrupts"]
+    
+    def getRatios(x):
+    	intrs = x["scpustats"]["interrupts"]
+    	softIntrs = x["scpustats"]["soft_interrupts"]
+    	return intrs / softIntrs
+    
+    with Pool(5) as p:
+    	interruptsCounts = p.map(getInterrupts, scpustatsList)
+    	softInterrupCounts = p.map(getSoftInterrupts, scpustatsList)
+    	ratios = p.map(getRatios, scpustatsList)
+    
+    	log("Extraction of interrupts counts is complete.")
+    
+    	# Interrupts
+    	y = list(numpy.diff(interruptsCounts))
+    	x = list(range(len(y)))
+    
+    	oId = "PLT_ADJ_INTERRUPTS_DIFFERENCES_IDLE"
+    
+    	colPlots = db.plots
+    	fileId = fs.put(str([x, y]), encoding='utf-8')
+    	log('Inserted plot file data into "db_mis_research.fs.files" with ID {}', fileId)
+    
+    	xLabel = 'Time'
+    	yLabel = 'Difference Between Adjacent Interrupts Counts'
+    	title = 'Variation of Differences of Interrupt Counts'
+    
+    	obj = {"_id": oId, "name": "Difference Between Adjacent Interrupts Counts", "fileId": fileId, "xLabel": xLabel, "yLabel": yLabel, "title": title}
+    
+    	oId = colPlots.insert_one(obj).inserted_id
+    	log('Inserted plot metadata into "db_mis_research.plots" with ID {}', oId)
+    
+    	# Soft Interrupts
+    	y = list(numpy.diff(softInterrupCounts))
+    	x = list(range(len(y)))
+    
+    	oId = "PLT_ADJ_SOFT_INTERRUPTS_DIFFERENCES_IDLE"
+    
+    	colPlots = db.plots
+    	fileId = fs.put(str([x, y]), encoding='utf-8')
+    	log('Inserted plot file data into "db_mis_research.fs.files" with ID {}', fileId)
+    
+    	xLabel = 'Time'
+    	yLabel = 'Difference Between Adjacent Soft Interrupts Counts'
+    	title = 'Variation of Differences of Soft Interrupt Counts'
+    
+    	obj = {"_id": oId, "name": "Difference Between Adjacent Soft Interrupts Counts", "fileId": fileId, "xLabel": xLabel, "yLabel": yLabel, "title": title}
+    
+    	oId = colPlots.insert_one(obj).inserted_id
+    	log('Inserted plot metadata into "db_mis_research.plots" with ID {}', oId)
+    
+    	# Interrupts / Soft Interrupts
+    	y = list(numpy.diff(ratios))
+    	x = list(range(len(y)))
+    
+    	oId = "PLT_ADJ_INTERRUPTS_RATIOS_DIFFERENCES_IDLE"
+    
+    	colPlots = db.plots
+    	fileId = fs.put(str([x, y]), encoding='utf-8')
+    	log('Inserted plot file data into "db_mis_research.fs.files" with ID {}', fileId)
+    
+    	xLabel = 'Time'
+    	yLabel = 'Difference Between Adjacent Ratios of Intterupts/Soft Interrupts Counts'
+    	title = 'Variation of Differences of Ratios of Intterupts/Soft Interrupts Counts'
+    
+    	obj = {"_id": oId, "name": "Difference Between Adjacent Soft Interrupts Counts", "fileId": fileId, "xLabel": xLabel, "yLabel": yLabel, "title": title}
+    
+    	oId = colPlots.insert_one(obj).inserted_id
+    	log('Inserted plot metadata into "db_mis_research.plots" with ID {}', oId)
+    
+    	client.close();
+    
+    	log('Display of plot closed! COMPLETE!')
+    \end{minted}
+    \caption{Python implementation of the routine to differentiate the sequence data}
+    \label{lst:py_class_float}
+\end{code}

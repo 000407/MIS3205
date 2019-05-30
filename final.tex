@@ -1,4 +1,4 @@
-\documentclass[oneside]{book}
+\documentclass[oneside,12pt]{book}
 
 \usepackage{geometry}
 \geometry{
@@ -11,17 +11,83 @@
 \usepackage[utf8]{inputenc}
 \usepackage{emptypage}
 \usepackage{changepage}
+\usepackage[acronym]{glossaries}
+\usepackage{multirow}
+\usepackage[T1]{fontenc}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{mathtools}
+\usepackage{float}
+\usepackage[toc]{appendix}
+\usepackage{minted}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage[super]{nth}
+\usepackage[hyphens]{url}
+\usepackage{enumitem}
+\usepackage{rotating}
+\usepackage{datetime}
+\usepackage{afterpage}
+\usepackage[justification=centering]{caption}
+
+\graphicspath{ {./images/} }
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+
+\newcommand{\Tau}{\mathrm{T}}
+\newcommand{\twodots}{\mathinner {\ldotp \ldotp}}
+\newcommand{\ilcode}[1]{\colorbox{codegray}{\texttt{#1}}}
 
 \newenvironment{sectionlist}
   {\adjustwidth{3em}{0pt}}
   {\endadjustwidth}
+ \newenvironment{code}{\captionsetup{type=listing}}{}
+
+\input{acro}
+
+\DeclareUnicodeCharacter{2212}{-}
+
+\renewcommand{\appendixname}{Appendix}
 
 \begin{document}
 
+\newdateformat{monthyeardate}{%
+  \monthname[\THEMONTH], \THEYEAR}
+
+\author{
+Student ID: 16770268 \\ 
+Master of Information Security \\
+University of Colombo School of Computing }
+
+\title{True Randomness using the Randomness in Natural Phenomenon}
+\author{H.K.R.K. Senadheera}
+\date{31 May 2019}
+
+\begin{titlepage}
+    \vspace*{1.4in}
+    \centering
+    \includegraphics{uoc.png}\\
+    {\fontsize{28}{28}\selectfont \textbf{True Randomness using the Randomness in Natural Phenomenon\par}} \\[0.5in]
+    
+    {\fontsize{20}{20}\selectfont \textbf{A dissertation submitted for the Degree of Master of Information Security\par}}\\[0.7in]
+    
+    {\fontsize{20}{20}\selectfont \textbf{H.K.R.K. Senadheera \\
+    University of Colombo School of Computing\par}}\\[2cm]
+    
+    \includegraphics[scale=1]{ucsc.png}
+\end{titlepage}
+
+% \begin{document}
+
+\definecolor{codegray}{gray}{0.9}
+
 \frontmatter
 
-\title{Title}
-\maketitle
+% \title{Title}
+% \maketitle
 
 \chapter{Abstract}
 Abstract goes here
@@ -31,14 +97,12 @@ Acknowledgements goes here
 
 \tableofcontents
 
-\chapter{List of Tables}
-List of Tables goes here
+\listoftables
 
-\chapter{List of Figures}
-List of Figures goes here
+\listoffigures
 
-\chapter{Abbreviations}
-List of Abbreviations goes here
+%\chapter{Abbreviations}
+\printglossary[type=\acronymtype,title=Abbreviations,nonumberlist]
 
 \mainmatter
 
@@ -60,7 +124,10 @@ List of Abbreviations goes here
 \chapter{Conclusion}
 \input{chapter6}
 
+\input{appendices.tex}
+
 \newpage
+\Urlmuskip=0mu plus 1mu
 \bibliographystyle{IEEEannot}
 \bibliography{ref}
 

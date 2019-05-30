@@ -1,0 +1,62 @@
+\chapter{FloatRAND - Random Number Generator}
+
+This is the Python implementation of the RNG based on the floating point conversion.
+
+\begin{code}
+    \begin{minted}[breaklines,tabsize=2]{py}
+        import numpy as np
+        from loggin import log
+        
+        class FloatRAND(object):
+        	"""docstring for FloatRAND"""
+        	def __init__(self, seed1, seed2):
+        		try:
+        			n = int(seed1)
+        			d = int(seed2)
+        			div = ('%.20f' % (n / d))
+        			seed = ''.join(div.split('.'))
+        			# Validity and the complexity constraints could be implemented here
+        		except ValueError as e:
+        			log("Invalid seed(s)! Each should consist of only numbers.")
+        		super(FloatRAND, self).__init__()
+        		self.seed = seed
+        
+        	def __arrayTimes2(self, arr):
+        		c = 0
+        
+        		for i in reversed(range(len(arr))):
+        			i2 = c + (arr[i] * 2);
+        			c = i2 // 10
+        			arr[i] = i2 % 10
+        
+        		return [c, arr]
+        
+        	def generate(self, length, seed = None):
+        		if(seed != None):
+        			self.seed = seed
+        		f = [int(e.encode('ascii')) for e in self.seed]
+        
+        		zero = [0] * len(f)
+        
+        		bitStr = np.array([0] * length)
+        
+        		for x in range(0, length):
+        			if f == zero:
+        				break
+        
+        			[c, f] = self.__arrayTimes2(f)
+        			bitStr[x] = c
+        
+        		return bitStr
+        
+        	def saveToFile(self, bitStr, fname = None):
+        		if(fname == None):
+        			fname = '{}.txt'.format(self.seed)
+        		bitStr = map(str, bitStr);
+        		file = open(fname, 'w')
+        		file.write(''.join(bitStr))
+        		file.close()
+    \end{minted}
+    \caption{Python implementation of the \texttt{FloatRAND} class - A RNG based on Floating Point Conversion}
+    \label{lst:py_class_float}
+\end{code}
